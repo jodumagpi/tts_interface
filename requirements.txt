@@ -8,3 +8,10 @@ tgt
 pyworld
 torchaudio
 tensorboardX
+torch
+matplotlib
+numpy
+scipy
+tqdm
+pillow
+pyyaml
