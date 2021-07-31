@@ -1,5 +1,4 @@
 # path configurations
-dataset_name = "male_voices"
 source_dataset_path = "male_voices"
 
 # data save configurations

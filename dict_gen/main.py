@@ -7,10 +7,10 @@ import configs as cfg
 def main():
 
 	_ 			  = create_dir(cfg.savedir)
-	savedir			  = create_dir(cfg.savedir, cfg.dataset_name)
+	savedir			  = create_dir(cfg.savedir)
 	savepath		  = create_dir(savedir, "wavs_with_lab")
 	savepath_wavs		  = create_dir(savedir, "wavs")
-	metadata_savepath	  = get_path(savedir, cfg.metadata_name)
+	metadata_savepath	  = get_path(savedir)
 	grapheme_dict_savepath	  = get_path(savedir, cfg.grapheme_dictionary_name)
 	phoneme_dict_savepath	  = get_path(savedir, cfg.phoneme_dictionary_name)
 
