@@ -17,8 +17,8 @@ source $root_dir/miniconda3/bin/activate aligner
 mfa thirdparty download
 
 # download and install mfa
-INSTALL_DIR="/tmp/mfa" # path to install directory
-source {INSTALL_DIR}/miniconda3/bin/activate aligner; mfa align --help
+INSTALL_DIR=${/tmp/mfa} # path to install directory
+source $INSTALL_DIR/miniconda3/bin/activate aligner; mfa align --help
 
 echo -e "\n======== DONE =========="
 echo -e "\nMFA Activated!"

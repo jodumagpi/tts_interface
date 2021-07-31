@@ -1,0 +1,11 @@
+git+https://github.com/MontrealCorpusTools/Montreal-Forced-Aligner.git
+montreal-forced-aligner
+librosa==0.6.2
+numba==0.48
+g2p==0.5.20200814
+g2p-en==2.1.0
+g2pK==0.9.4
+tgt
+pyworld
+torchaudio
+tensorboardX
