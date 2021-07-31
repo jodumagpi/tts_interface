@@ -8,6 +8,8 @@ from utils.hparams import HParam
 from utils.writer import MyWriter
 from datasets.dataloader import create_dataloader
 
+import warnings
+warnings.filterwarnings("ignore") # clear verbose warnings
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

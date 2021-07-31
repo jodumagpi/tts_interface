@@ -18,4 +18,6 @@ rm -rf ./temp
 
 python vocoder/preprocess.py -c vocoder/config/default.yaml -d data/vocoder
 
-python vocoder/trainer.py -c vocoder/config/default.yaml -n exp
+python vocoder/trainer.py -c vocoder/config/default.yaml -n exp # train from scract
+# if you want to train from a checkpoint, please specify the path of the checkpoint
+# python vocoder/trainer.py -c vocoder/config/default.yaml -p /path/to/checkpoint.pt -n exp

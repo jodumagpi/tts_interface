@@ -4,9 +4,11 @@ import random
 from shutil import copyfile
 
 def split():
-    os.mkdir("data/vocoder")
-    os.mkdir("data/vocoder/train")
-    os.mkdir("data/vocoder/valid")
+
+    if not os.path.exists("data/vocoder"):
+        os.mkdir("data/vocoder")
+        os.mkdir("data/vocoder/train")
+        os.mkdir("data/vocoder/valid")
 
     wavs = sorted([x for x in os.listdir("./data") if x.endswith(".wav")])
     random.seed(55)
