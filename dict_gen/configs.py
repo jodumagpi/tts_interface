@@ -1,5 +1,5 @@
 # path configurations
-source_dataset_path = "male_voices"
+source_dataset_path = "data"
 
 # data save configurations
 savedir = "dict-results"
