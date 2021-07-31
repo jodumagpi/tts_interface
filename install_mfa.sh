@@ -2,22 +2,23 @@
 
 ## a script to install Montreal Forced Aligner (MFA)
 
-root_dir=${1:-/tmp/mfa}
-mkdir -p $root_dir
-cd $root_dir
+mkdir -p /tmp/mfa
+cd /tmp/mfa
 
 # download miniconda3
 wget -q --show-progress https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
-bash Miniconda3-latest-Linux-x86_64.sh -b -p $root_dir/miniconda3 -f
+bash Miniconda3-latest-Linux-x86_64.sh -b -p /tmp/mfa/miniconda3 -f
 
 # create py38 env
-$root_dir/miniconda3/bin/conda create -n aligner -c conda-forge openblas python=3.8 openfst pynini ngram baumwelch -y
-source $root_dir/miniconda3/bin/activate aligner
+/tmp/mfa/miniconda3/bin/conda create -n aligner -c conda-forge openblas python=3.8 openfst pynini ngram baumwelch -y
+# activate env
+source /tmp/mfa/miniconda3/bin/activate aligner
+
+# install mfa, download kaldi
+pip install montreal-forced-aligner # install requirements
+pip install git+https://github.com/MontrealCorpusTools/Montreal-Forced-Aligner.git # install latest updates
 
 mfa thirdparty download
-
-# download and install mfa
-source tmp/mfa/miniconda3/bin/activate aligner; mfa align --help
 
 echo -e "\n======== DONE =========="
 echo -e "\nMFA Activated!"
