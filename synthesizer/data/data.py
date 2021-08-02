@@ -9,6 +9,7 @@ from utils import get_alignment, standard_norm, remove_outlier, average_by_durat
 import hparams as hp
 from jamo import h2j
 import codecs
+from random import choices
 
 from sklearn.preprocessing import StandardScaler
 
@@ -43,10 +44,9 @@ def build_from_path(in_dir, out_dir, meta):
             else:
                 info, n = ret
             
-            if basename[0] == '1':
-                val.append(info)
-            else:
-                train.append(info)
+            # same training and validation data
+            val.append(info)
+            train.append(info)
 
             if index % 100 == 0:
                 print("Done %d" % index)

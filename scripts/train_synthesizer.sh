@@ -1,7 +1,6 @@
 #!/bin/bash
 
 ## a script to train the synthesizer
-
 sudo apt install -q -y ffmpeg
 sudo apt-get install -q -y zip unzip
 
@@ -9,9 +8,8 @@ python synthesizer/data/prepare.py
 cd mfa-results/wav
 zip -qr TextGrid.zip *
 cd -
-mv mfa-results/wav/TextGrid.zip synthesizer
+mv mfa-results/wav/TextGrid.zip .
 
-mkdir synthesizer/vocoder/pretrained_models/
 mkdir synthesizer-chkpt
 mkdir synthesizer-chkpt/data
 

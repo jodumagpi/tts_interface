@@ -72,7 +72,7 @@ weight_decay = 0.
 # Vocoder
 vocoder = 'vocgan'
 vocoder_pretrained_model_name = "vocgan.pt"
-vocoder_pretrained_model_path = os.path.join("./vocoder/pretrained_models/", vocoder_pretrained_model_name)
+vocoder_pretrained_model_path = os.path.join("./synthesizer/vocoder/pretrained_models/", vocoder_pretrained_model_name)
 
 # Log-scaled duration
 log_offset = 1.
