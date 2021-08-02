@@ -19,30 +19,72 @@ import codecs
 from g2pk import G2p
 from jamo import h2j
 
+from scipy.io import wavfile
+
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+def cut(signal):
+    for i in range(len(signal)):
+        if np.abs(signal[i]) > 500:
+            return i
+
+def split(sentence):
+
+    remove = ["“", "”", "‘", "’", "\'", "\"", "}", ")", "]"]
+    space = ["(", "{", "["]
+    replace = ["·"]
+    topic = ["는", "은"]
+    obj = ["를", "을"]
+    subject = ["이", "가"]
+    location = ["에", "서"]
+    thru = ["로"]
+    conj = ["고", "과", "와"]
+    extra = ["인", "면", "한", "해", "우", "최", "된", "대"]
+    pause = topic + obj + subject + location + thru + conj + extra
+
+    chars = [x for x in sentence]
+    new_sentence = []
+
+    for e, c in enumerate(chars):
+        if c in remove:
+            continue # ignore
+        elif c in space: # replace brackets w spaces
+            new_sentence.append(" ")
+        elif c in replace: # some specific punctuation
+            new_sentence.append(", ")
+        #elif c in pause and chars[e+1] == " " and not e == 0: # if word ends like
+        #    new_sentence.append(c+";")
+        else:
+            new_sentence.append(c)
+    
+    new_sentence = "".join(new_sentence)
+    #print("Processed sentence:")
+    #print(new_sentence)
+    lst = new_sentence.split(" ")
+    splits = [" ".join(lst[i:i + 3]) for i in range(0, len(lst), 3)]
+    if len(splits[-1].split(" ")) == 1 and len(splits) > 1:
+        splits[-2] += splits[-1]
+        del splits[-1]
+    return splits
 
 def kor_preprocess(text):
     text = text.rstrip(punctuation)
     
     g2p=G2p()
     phone = g2p(text)
-    print('after g2p: ',phone)
     phone = h2j(phone)
-    print('after h2j: ',phone)
     phone = list(filter(lambda p: p != ' ', phone))
     phone = '{' + '}{'.join(phone) + '}'
-    print('phone: ',phone)
     phone = re.sub(r'\{[^\w\s]?\}', '{sp}', phone)
-    print('after re.sub: ',phone)
     phone = phone.replace('}{', ' ')
 
-    print('|' + phone + '|')
     sequence = np.array(text_to_sequence(phone,hp.text_cleaners))
     sequence = np.stack([sequence])
     return torch.from_numpy(sequence).long().to(device)
 
-def get_FastSpeech2(num):
-    checkpoint_path = os.path.join(hp.checkpoint_path, "checkpoint_{}.pth.tar".format(num))
+
+def get_FastSpeech2():
+    checkpoint_path = os.path.join(hp.checkpoint_path, "fastspeech.pth.tar")
     model = nn.DataParallel(FastSpeech2())
     model.load_state_dict(torch.load(checkpoint_path, map_location=device)['model'])
     model.requires_grad = False
@@ -50,7 +92,6 @@ def get_FastSpeech2(num):
     return model
 
 def synthesize(model, vocoder, text, sentence, prefix=''):
-    sentence = sentence[:10] # long filename will result in OS Error
 
     mean_mel, std_mel = torch.tensor(np.load(os.path.join(hp.preprocessed_path, "mel_stat.npy")), dtype=torch.float).to(device)
     mean_f0, std_f0 = torch.tensor(np.load(os.path.join(hp.preprocessed_path, "f0_stat.npy")), dtype=torch.float).to(device)
@@ -74,58 +115,27 @@ def synthesize(model, vocoder, text, sentence, prefix=''):
     f0_output = utils.de_norm(f0_output, mean_f0, std_f0).squeeze().detach().cpu().numpy()
     energy_output = utils.de_norm(energy_output, mean_energy, std_energy).squeeze().detach().cpu().numpy()
 
-    if not os.path.exists(hp.test_path):
-        os.makedirs(hp.test_path)
-
-    Audio.tools.inv_mel_spec(mel_postnet_torch[0], os.path.join(hp.test_path, '{}_griffin_lim_{}.wav'.format(prefix, sentence)))
-
-    if vocoder is not None:
-        if hp.vocoder.lower() == "vocgan":
-            utils.vocgan_infer(mel_postnet_torch, vocoder, path=os.path.join(hp.test_path, '{}_{}_{}.wav'.format(prefix, hp.vocoder, sentence)))   
-    
-    utils.plot_data([(mel_postnet_torch[0].detach().cpu().numpy(), f0_output, energy_output)], ['Synthesized Spectrogram'], filename=os.path.join(hp.test_path, '{}_{}.png'.format(prefix, sentence)))
-
+    return utils.vocgan_infer(mel_postnet_torch, vocoder, path=os.path.join(""))
 
 if __name__ == "__main__":
-    # Test
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--step', type=int, default=30000)
-    args = parser.parse_args()
-
     
-    model = get_FastSpeech2(args.step).to(device)
-    if hp.vocoder == 'vocgan':
-        vocoder = utils.get_vocgan(ckpt_path=hp.vocoder_pretrained_model_path)
-    else:
-        vocoder = None   
- 
-    #kss
-    eval_sentence=['그는 괜찮은 척하려고 애쓰는 것 같았다','그녀의 사랑을 얻기 위해 애썼지만 헛수고였다','용돈을 아껴써라','그는 아내를 많이 아낀다','요즘 공부가 안돼요','한 여자가 내 옆에 앉았다']
-    train_sentence=['가까운 시일 내에 한번, 댁으로 찾아가겠습니다','우리의 승리는 기적에 가까웠다','아이들의 얼굴에는 행복한 미소가 가득했다','헬륨은 공기보다 가볍다','이것은 간단한 문제가 아니다']
-    test_sentence=['안녕하세요, 한동대학교 딥러닝 연구실입니다.', '이 프로젝트가 여러분에게 도움이 되었으면 좋겠습니다.', '시간이 촉박해요','이런, 큰일 났어','좀 더 먹지 그래?','제가 뭘 잘못했죠?','더 이상 묻지마']
-    
-    g2p=G2p()
-    print('which sentence do you want?')
-    print('1.eval_sentence 2.train_sentence 3.test_sentence 4.create new sentence')
-
-    mode=input()
-    print('you went for mode {}'.format(mode))
-    if mode=='4':
-        print('input sentence')
-        sentence = input()
-    elif mode=='1':
-        sentence = eval_sentence
-    elif mode=='2':
-        sentence = train_sentence
-    elif mode=='3':
-        sentence = test_sentence
-    
-    print('sentence that will be synthesized: ')
-    print(sentence)
-    if mode != '4':
-        for s in sentence:
-            text = kor_preprocess(s)
-            synthesize(model, vocoder, text, s, prefix='step_{}'.format(args.step))
-    else:
-        text = kor_preprocess(sentence)
-        synthesize(model, vocoder, text, sentence, prefix='step_{}'.format(args.step))
+	model = get_FastSpeech2().to(device)
+	vocoder = utils.get_vocgan(ckpt_path=hp.vocoder_pretrained_model_path)
+	
+	g2p=G2p()
+	
+	print('input sentence')
+	sentence = input()
+	
+	print('sentence that will be synthesized: ')
+	print(sentence)
+	
+	sentence = split(sentence)
+	splits = []
+	for e, s in enumerate(sentence):   
+		text = kor_preprocess(s)
+		res = synthesize(model, vocoder, text, sentence)
+		idx = cut(res)
+		splits.append(res[idx:])
+	audio = np.hstack(splits)
+	wavfile.write("result.wav", hp.sampling_rate, audio)
