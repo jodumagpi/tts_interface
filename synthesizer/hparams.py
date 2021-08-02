@@ -1,7 +1,7 @@
 import os
 ### dataset ###
 dataset = "data"
-data_path = dataset
+data_path = os.path.join(dataset, "synthesizer")
 meta_name = "transcript.txt"	# "transcript.v.1.4.txt" or "transcript.v.1.3.txt" 
 textgrid_name = "TextGrid.zip"
 
@@ -50,11 +50,11 @@ variance_predictor_dropout = 0.5
 max_seq_len = 1000
 
 # Checkpoints and synthesis path
-preprocessed_path = os.path.join("./preprocessed/", dataset)
-checkpoint_path = os.path.join("./ckpt/", dataset)
-eval_path = os.path.join("./eval/", dataset)
-log_path = os.path.join("./log/", dataset)
-test_path = "./results"
+preprocessed_path = os.path.join("./synthesizer-preprocessed/", dataset)
+checkpoint_path = os.path.join("./synthesizer-chkpt/", dataset)
+eval_path = os.path.join("./synthesizer-eval/", dataset)
+log_path = os.path.join("./synthesizer-logs/", dataset)
+test_path = "./synthesizer-results"
 
 
 # Optimizer
