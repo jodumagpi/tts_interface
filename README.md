@@ -41,7 +41,7 @@ Training the synthesizer involves 3 steps.
       bash scripts/align_data.sh
       ```
   3. Train the synthesizer.\
-      This code already includes preprocessing. Before running the script, make sure that a trained VocGAN model is in the `synthesizer/vocoder/pretrained_models` folder. When training from scratch, directly run the code below.
+      This code already includes preprocessing. Before running the script, make sure that a trained VocGAN model (renamed to `vocgan.pt`) is in the `synthesizer/vocoder/pretrained_models` folder. When training from scratch, directly run the script below.
       ```
       bash scripts/train_synthesizer.sh
       ```
@@ -50,3 +50,10 @@ Training the synthesizer involves 3 steps.
       python synthesizer/train.py --restore_step 1000 
       ```
       The model weights are saved at the `synthesizer-chkpt` folder. Default configurations can be changed by modifying the `synthesizer/hparams.py` file.
+ 
+- **Run TTS**\
+  After training the synthesizer, the entire TTS engine can be evaluated by generating speech from an input text. To do this, rename the latest model that you want to use as `fastspeech.pth.tar`, which can be found in the `synthesizer-chkpt/data/` folder. Synthesize speech by running the command below.
+  ```
+  python synthesizer/synthesize.py
+  ```
+  The result is saved as a wav file named `result.wav`.
