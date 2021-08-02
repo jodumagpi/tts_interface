@@ -40,8 +40,13 @@ Training the synthesizer involves 3 steps.
       ```
       bash scripts/align_data.sh
       ```
-  3. Train the synthesizer. (includes data preprocessing)
+  3. Train the synthesizer.\
+      This code already includes preprocessing. Before running the script, make sure that a trained VocGAN model is in the `synthesizer/vocoder/pretrained_models` folder. When training from scratch, directly run the code below.
       ```
       bash scripts/train_synthesizer.sh
       ```
-  The model weights are saved at the `synthesizer-chkpt` folder. Default configurations can be changed by modifying the `synthesizer/hparams.py` file.
+      However, when training from a checkpoint, make sure that the checkpoint is in the `synthesizer-chkpt/data/` folder then edit the script (line 17) to indicate the latest iteration of the saved model before running the script as described above.
+      ```
+      python synthesizer/train.py --restore_step 1000 
+      ```
+      The model weights are saved at the `synthesizer-chkpt` folder. Default configurations can be changed by modifying the `synthesizer/hparams.py` file.
