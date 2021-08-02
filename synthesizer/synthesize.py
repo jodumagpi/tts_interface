@@ -4,9 +4,6 @@ import numpy as np
 import hparams as hp
 import os
 
-os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"
-os.environ["CUDA_VISIBLE_DEVICES"]=hp.synth_visible_devices
-
 import argparse
 import re
 from string import punctuation
@@ -47,7 +44,7 @@ def kor_preprocess(text):
 def get_FastSpeech2(num):
     checkpoint_path = os.path.join(hp.checkpoint_path, "checkpoint_{}.pth.tar".format(num))
     model = nn.DataParallel(FastSpeech2())
-    model.load_state_dict(torch.load(checkpoint_path)['model'])
+    model.load_state_dict(torch.load(checkpoint_path, map_location=device)['model'])
     model.requires_grad = False
     model.eval()
     return model
