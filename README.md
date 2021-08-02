@@ -2,6 +2,8 @@
 
 This repository contains the source code for a TTS algorithm based on deep learning models. The algorithm adapts two famous deep learning models, VocGAN and FastSpeech, as vocoder and synthesizer respectively. This code is mainly developed for Korean language only. The instructions for using the code will be described as follows.
 
+This code works on an Ubuntu 18.04.5 machine with Python 3.7.11.
+
 - **Clone the repository and install requirements.**
   ```
   git clone https://github.com/jodumagpi/tts_interface.git
