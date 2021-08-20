@@ -21,6 +21,8 @@ from jamo import h2j
 
 from scipy.io import wavfile
 
+import noisereduce as nr
+
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 def cut(signal):
@@ -138,4 +140,5 @@ if __name__ == "__main__":
 		idx = cut(res)
 		splits.append(res[idx:])
 	audio = np.hstack(splits)
+	audio = nr.reduce_noise(audio, hp.sampling_rate)
 	wavfile.write("result.wav", hp.sampling_rate, audio)
